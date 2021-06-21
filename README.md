@@ -1,2 +1,2 @@
 # HypixelPingBot
- idk bruh
+idk bruh
