@@ -6,10 +6,13 @@ async function scrap() {
 
   try {
     await driver.get('https://hypixel.net/');
+    console.log('opened the page');
     let percent = await driver.findElement(By.id('progress')).getAttribute('value');
     console.log(`казино выкачано на ${percent} процентов. продолжить?`);
 
-    return percent;
+    const update;
+
+    return { percent, update };
   }
   catch(e) {
     console.log('an error occurred: ' + e.message);
@@ -20,5 +23,3 @@ async function scrap() {
 }
 
 module.exports = scrap;
-
-// scrap();
