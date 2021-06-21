@@ -1,22 +1,35 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
-const token = require('token.json').token;
+const token = require('./token.json').token;
 
-const prefix = "#";
+const scrap = require('./scrapper.js');
 
-function handler() {
-    console.log('ready! ass! dick!')
+
+const prefix = "-";
+
+async function refresh_hypixel() {
+    const percent = await scrap();
+    const data = { percent: percent };
+
+    return data;
 }
 
-function message_handler(message) {
-    if (message.content.starsWith(prefix)) return;
+function handler() {
+    console.log('ready! ass! dick!');
+}
+
+async function message_handler(message) {
+    if (message.content.startsWith(prefix)) return;
 
     const commandBody = message.content.slice(prefix.length);
     const args = commandBody.split(' ');
     const command = args.shift().toLowerCase();
 
     if (command == "hypixel_refresh") {
-        // TODO сюда подключить скрип
+        // я подключил скрипт))
+
+        const data = await refresh_hypixel();
+        message.reply('hypixel progress percentage: ' + data.percent);
     }
 }
 
