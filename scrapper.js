@@ -1,25 +1,36 @@
-const { Builder, By, Key, until } = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
+const puppeteer = require('puppeteer');
 
 async function scrap() {
-  let driver = await new Builder().forBrowser('chrome').build();
+    const browser = await puppeteer.launch({headless: true, args: ['--no-sandbox']});
+    const page = await browser.newPage();
+    await page.goto('https://hypixel.net/');
 
-  try {
-    await driver.get('https://hypixel.net/');
-    console.log('opened the page');
-    let percent = await driver.findElement(By.id('progress')).getAttribute('value');
-    console.log(`казино выкачано на ${percent} процентов. продолжить?`);
+    try {
+    await page.waitForSelector('#progress', { timeout: 2000 });
 
-    const update;
+    let bar = await page.$('#progress');
+    if (bar === null) { // the progress bar is no longer there
+        console.log('there\'s no progress bar! Assuming Hypixel is up!');
+        console.log('taking a screenshot...');
+        await page.screenshot({ path: 'hypixel.png' });
+        return { percent: 100, done: true };
+    }
+    else {
+        let percent = await bar.evaluate(function(bar) { return bar.value });
+        // a niche meme (a pretty funny one)
+        console.log(`казино выкачано на ${percent} процентов. продолжить?`);
+        await page.screenshot({ path: 'hypixel.png' });
+        return { percent, done: false };
+    }
 
-    return { percent, update };
-  }
-  catch(e) {
-    console.log('an error occurred: ' + e.message);
-  }
-  finally {
-    await driver.quit();
-  }
+    }
+    catch(e) {
+        console.log('error occurred: ' + e.message);
+        return { percent: undefined, done: undefined };
+    }
+    finally {
+        await browser.close();
+    }
 }
 
 module.exports = scrap;
